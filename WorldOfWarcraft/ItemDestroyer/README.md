@@ -61,3 +61,7 @@ no confirmation:
   (`120100`). If the game reports the addon as out of date after a patch,
   update that number to match your client's build (Options > AddOns, or
   `/run print(select(4, GetBuildInfo()))`).
+
+ ## AI gernerated
+
+ - AI-Generated Content
