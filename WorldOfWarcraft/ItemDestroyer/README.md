@@ -62,6 +62,6 @@ no confirmation:
   update that number to match your client's build (Options > AddOns, or
   `/run print(select(4, GetBuildInfo()))`).
 
- ## AI gernerated
+ ## AI Generated
 
  - AI-Generated Content
