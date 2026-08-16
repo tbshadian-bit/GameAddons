@@ -8,9 +8,15 @@ local PREFIX = "|cffff4040ItemDestroyer:|r "
 ItemDestroyerDB = ItemDestroyerDB or {}
 
 local function InitDB()
-    if ItemDestroyerDB.requireModifier == nil then
-        ItemDestroyerDB.requireModifier = true -- require holding Shift by default, as a safety net
+    if ItemDestroyerDB.requireConfirm == nil then
+        if ItemDestroyerDB.requireModifier ~= nil then
+            -- migrate old setting name
+            ItemDestroyerDB.requireConfirm = ItemDestroyerDB.requireModifier
+        else
+            ItemDestroyerDB.requireConfirm = true -- prompt "are you sure?" by default
+        end
     end
+    ItemDestroyerDB.requireModifier = nil
 end
 
 local function GetMouseoverFrame()
@@ -59,13 +65,57 @@ local function GetBagSlotFromFrame(frame)
     return nil
 end
 
-local function DestroyMouseoverItem(modifierHeld)
-    InitDB()
-
-    if ItemDestroyerDB.requireModifier and not modifierHeld then
-        print(PREFIX .. "Hold Shift while triggering the macro to destroy an item (safety check). Use /destroyitem safety off to disable this.")
+-- Actually picks up and deletes the item, re-checking it's still the same
+-- item (it may have moved or been consumed while a confirmation was open).
+local function PerformDestroy(bag, slot, expectedLink)
+    if CursorHasItem() then
+        print(PREFIX .. "Your cursor already has an item on it. Aborting.")
         return
     end
+
+    local info = C_Container.GetContainerItemInfo(bag, slot)
+    if not info or not info.hyperlink then
+        print(PREFIX .. "That bag slot is empty.")
+        return
+    end
+
+    if expectedLink and info.hyperlink ~= expectedLink then
+        print(PREFIX .. "That slot changed since you confirmed. Aborting.")
+        return
+    end
+
+    if info.isLocked then
+        print(PREFIX .. "That item is locked and can't be destroyed right now.")
+        return
+    end
+
+    local itemName = C_Item.GetItemNameByID and C_Item.GetItemNameByID(info.hyperlink) or info.hyperlink
+
+    C_Container.PickupContainerItem(bag, slot)
+    if not CursorHasItem() then
+        print(PREFIX .. "Could not pick up the item.")
+        return
+    end
+
+    DeleteCursorItem()
+    print(PREFIX .. "Destroyed " .. tostring(itemName) .. ".")
+end
+
+StaticPopupDialogs["ITEMDESTROYER_CONFIRM"] = {
+    text = "Destroy %s?",
+    button1 = YES,
+    button2 = NO,
+    OnAccept = function(self, data)
+        PerformDestroy(data.bag, data.slot, data.link)
+    end,
+    timeout = 0,
+    whileDead = true,
+    hideOnEscape = true,
+    preferredIndex = 3,
+}
+
+local function DestroyMouseoverItem()
+    InitDB()
 
     if CursorHasItem() then
         print(PREFIX .. "Your cursor already has an item on it. Aborting.")
@@ -90,16 +140,12 @@ local function DestroyMouseoverItem(modifierHeld)
         return
     end
 
-    local itemName = C_Item.GetItemNameByID and C_Item.GetItemNameByID(info.hyperlink) or info.hyperlink
-
-    C_Container.PickupContainerItem(bag, slot)
-    if not CursorHasItem() then
-        print(PREFIX .. "Could not pick up the item.")
-        return
+    if ItemDestroyerDB.requireConfirm then
+        local itemName = C_Item.GetItemNameByID and C_Item.GetItemNameByID(info.hyperlink) or info.hyperlink
+        StaticPopup_Show("ITEMDESTROYER_CONFIRM", itemName, nil, { bag = bag, slot = slot, link = info.hyperlink })
+    else
+        PerformDestroy(bag, slot, info.hyperlink)
     end
-
-    DeleteCursorItem()
-    print(PREFIX .. "Destroyed " .. tostring(itemName) .. ".")
 end
 
 SLASH_ITEMDESTROYER1 = "/destroyitem"
@@ -109,14 +155,14 @@ SlashCmdList["ITEMDESTROYER"] = function(msg)
     msg = (msg or ""):lower():trim()
 
     if msg == "safety on" then
-        ItemDestroyerDB.requireModifier = true
-        print(PREFIX .. "Safety check enabled: hold Shift while triggering the macro to destroy an item.")
+        ItemDestroyerDB.requireConfirm = true
+        print(PREFIX .. "Safety check enabled: destroying an item will ask for confirmation.")
         return
     elseif msg == "safety off" then
-        ItemDestroyerDB.requireModifier = false
-        print(PREFIX .. "Safety check disabled: the macro will destroy the item under your cursor immediately.")
+        ItemDestroyerDB.requireConfirm = false
+        print(PREFIX .. "Safety check disabled: the macro will destroy the item under your cursor immediately, no prompt.")
         return
     end
 
-    DestroyMouseoverItem(IsShiftKeyDown())
+    DestroyMouseoverItem()
 end

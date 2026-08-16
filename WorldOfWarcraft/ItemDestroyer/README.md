@@ -5,9 +5,9 @@ your mouse is hovering over in your bags, triggered from a macro.
 
 ## ⚠️ Warning
 
-Destroying an item is **permanent**. This addon does not ask "are you sure?"
-for ordinary items — the whole point is a one-press destroy. Read the safety
-section below before using it.
+Destroying an item is **permanent**. By default the addon asks "are you
+sure?" before destroying anything — read the safety section below if you
+want to turn that off.
 
 ## Installation
 
@@ -34,16 +34,16 @@ section below before using it.
 ## Usage
 
 1. Hover your mouse over the item you want to destroy in your bags.
-2. Hold **Shift** and press the macro's keybind.
-3. The item is destroyed and a confirmation is printed to your chat window.
+2. Press the macro's keybind.
+3. By default, a confirmation prompt ("Destroy \<item\>?") pops up — click
+   **Yes** to destroy it, or **No** / Escape to cancel.
 
-By default a modifier key (Shift) must be held when you trigger the macro,
-as a safety net against destroying something by accident. You can turn this
-off or back on:
+You can disable the prompt so the macro destroys the item immediately with
+no confirmation:
 
 ```
-/destroyitem safety off   -- destroy immediately, no modifier required
-/destroyitem safety on    -- require Shift again (default)
+/destroyitem safety off   -- destroy immediately, no prompt
+/destroyitem safety on    -- ask for confirmation again (default)
 ```
 
 ## Notes / limitations
