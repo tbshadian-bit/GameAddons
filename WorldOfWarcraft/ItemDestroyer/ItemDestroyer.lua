@@ -1,6 +1,10 @@
 -- ItemDestroyer
 -- Destroys the item currently under your mouse cursor when you run the
 -- /destroyitem slash command from a macro/keybind.
+--
+-- AI-Generated Content Notice: this addon's code and documentation were
+-- generated with the assistance of an AI system (Claude). Disclosed for
+-- transparency under the EU AI Act's Article 50 requirements.
 
 local ADDON_NAME = ...
 local PREFIX = "|cffff4040ItemDestroyer:|r "

@@ -3,6 +3,13 @@
 A World of Warcraft addon for **Midnight (patch 12.1)** that destroys the item
 your mouse is hovering over in your bags, triggered from a macro.
 
+## AI-Generated Content Notice
+
+This addon's code and documentation were generated with the assistance of
+an AI system (Claude). This notice is provided for transparency in line
+with the EU AI Act's disclosure requirements for AI-generated content
+(Article 50).
+
 ## ⚠️ Warning
 
 Destroying an item is **permanent**. By default the addon asks "are you

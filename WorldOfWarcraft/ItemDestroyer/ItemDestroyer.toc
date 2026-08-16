@@ -1,9 +1,10 @@
 ## Interface: 120100
 ## Title: Item Destroyer
-## Notes: Destroy the item under your mouse cursor with a macro/keybind.
+## Notes: Destroy the item under your mouse cursor with a macro/keybind. (AI-generated addon)
 ## Author: tbshadian
 ## Version: 1.0.0
 ## SavedVariables: ItemDestroyerDB
 ## IconTexture: Interface\Icons\INV_Misc_Bomb_08
+## X-AI-Generated: true
 
 ItemDestroyer.lua
